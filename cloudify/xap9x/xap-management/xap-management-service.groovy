@@ -102,6 +102,18 @@ service {
 				"deploy-pu-puname":puname
 			])
 		 },
+		"deploy-epu": {puname, puurl,schema,partitions,backups,maxmemmb,maxcores,memcapacity,numcores ->
+			util.invokeLocal(context,"_deploy-epu", [
+				"deploy-epu-puurl":puurl,
+				"deploy-epu-schema":schema,
+				"deploy-epu-partitions":partitions,
+				"deploy-epu-backups":backups,
+				"deploy-epu-maxmemmb":maxmemmb,
+				"deploy-epu-maxcores":maxcores,
+				"deploy-epu-memcapacity":memcapacity,
+				"deploy-epu-numcores":numcores
+			])
+		 },
 		"deploy-pu-basic": {puurl->
 			util.invokeLocal(context,"_deploy-pu", [
 				"deploy-pu-puurl":puurl,
@@ -143,6 +155,7 @@ service {
 
 		//Actual parameterized calls
 		"_deploy-pu"	: "commands/deploy-pu.groovy",
+		"_deploy-epu"	: "commands/deploy-epu.groovy",
 		"_deploy-grid"	: "commands/deploy-grid.groovy",
 		"_undeploy-grid": "commands/undeploy-grid.groovy",
 		"_deploy-gateway": "commands/deploy-gateway.groovy"

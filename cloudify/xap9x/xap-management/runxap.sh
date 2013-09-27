@@ -27,4 +27,7 @@ launchTarget=
 options=
 
 $XAPDIR/bin/gsm.sh &
+if [ "$ESM" = "true" ]; then
+	$XAPDIR/bin/esm.sh &
+fi
 $XAPDIR/bin/gs-webui.sh

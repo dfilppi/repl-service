@@ -23,12 +23,17 @@ import org.cloudifysource.dsl.context.ServiceContextFactory
 context=ServiceContextFactory.serviceContext
 config = new ConfigSlurper().parse(new File(context.serviceName+"-service.properties").toURL())
 ip=InetAddress.getLocalHost().getHostAddress()
+esm=false
+
+//Below not needed (i think). Cloudify always starts ESM
+//if(!context.isLocalCloud() && context.instanceId==1)esm=true
 
 new AntBuilder().sequential {
 	exec(executable:"runxap.bat", osfamily:"windows",
 		output:"runxap.${System.currentTimeMillis()}.out",
 		error:"runxap.${System.currentTimeMillis()}.err"
 	){
+		env(key:"ESM",value:esm.toString())
 		env(key:"XAPDIR", value:"${config.installDir}\\${config.xapDir}")
 		env(key:"GSM_JAVA_OPTIONS",value:"-Dcom.sun.jini.reggie.initialUnicastDiscoveryPort=${config.lusPort} -Dcom.gs.multicast.enabled=false")
 		env(key:"LUS_JAVA_OPTIONS",value:"-Dcom.sun.jini.reggie.initialUnicastDiscoveryPort=${config.lusPort} -Dcom.gs.multicast.enabled=false")
@@ -46,6 +51,7 @@ new AntBuilder().sequential {
 		output:"runxap.${System.currentTimeMillis()}.out",
 		error:"runxap.${System.currentTimeMillis()}.err"
 	){
+		env(key:"ESM",value:esm.toString())
 		env(key:"XAPDIR", value:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}")
 		env(key:"LUS_JAVA_OPTIONS",value:"-Dcom.sun.jini.reggie.initialUnicastDiscoveryPort=${config.lusPort} -Dcom.gs.multicast.enabled=false")
 		env(key:"GSM_JAVA_OPTIONS",value:"-Dcom.sun.jini.reggie.initialUnicastDiscoveryPort=${config.lusPort} -Dcom.gs.multicast.enabled=false")
