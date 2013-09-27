@@ -25,8 +25,7 @@ config = new ConfigSlurper().parse(new File(context.serviceName+"-service.proper
 ip=InetAddress.getLocalHost().getHostAddress()
 esm=false
 
-//Below not needed (i think). Cloudify always starts ESM
-//if(!context.isLocalCloud() && context.instanceId==1)esm=true
+if(!context.isLocalCloud() && context.instanceId==1)esm=true
 
 new AntBuilder().sequential {
 	exec(executable:"runxap.bat", osfamily:"windows",
