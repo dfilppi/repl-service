@@ -138,7 +138,7 @@ service {
 		},
 		"undeploy-grid" : { name ->
 			util.invokeLocal(context,"_undeploy-grid", [
-				"undeploy-grid-name":name
+				"undeploy-grid":name
 			])
 		},
 		"deploy-gateway" : { puname,spacename,localgwname,targets,sources,String...lookups->
