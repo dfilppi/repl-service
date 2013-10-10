@@ -44,8 +44,8 @@ mgmt_service.instances.each{locators+="${it.hostAddress},"}
 
 
 // find gsm
-admin=new AdminFactory().addLocators("127.0.0.1:${config.lusPort}").createAdmin();
-gsm=admin.gridServiceManagers.waitForAtLeastOne(10,TimeUnit.SECONDS)
+admin=new AdminFactory().useDaemonThreads(true).addLocators("127.0.0.1:${config.lusPort}").createAdmin();
+gsm=admin.gridServiceManagers.waitForAtLeastOne(1,TimeUnit.MINUTES)
 assert gsm!=null
 
 // grab file
@@ -56,9 +56,14 @@ new AntBuilder().sequential {
 
 pu=new ProcessingUnitConfig()
 pu.setProcessingUnit("lib/${new File(puurl).name}")
+pu.setName(puname)
+pu.setClusterSchema(schema)
+pu.setNumberOfInstances(partitions)
+pu.setNumberOfBackups(backups)
+pu.setMaxInstancesPerVM(maxpervm)
+pu.setMaxInstancesPerMachine(maxpermachine)
 
 ac=new ApplicationConfig()
 ac.setName("${puname}")
 ac.addProcessingUnit(pu)
 gsm.deploy(ac)
-admin.close()

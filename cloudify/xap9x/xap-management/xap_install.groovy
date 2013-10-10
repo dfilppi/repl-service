@@ -28,21 +28,19 @@ new AntBuilder().sequential {
 	unzip(src:"${config.installDir}/${config.zipName}", dest:config.installDir, overwrite:true)
 }
 
-
 // Update gs ui port
 if(ServiceUtils.isWindows()){
   new AntBuilder().sequential {
-	copy(file:"overwrite/gs-webui.bat",todir:"${config.installDir}/${config.xapDir}/tools/gs-webui",overwrite:"true")
+   replace(file:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}/tools/gs-webui/gs-webui.sh",token:"8099",value:"${config.uiPort}")
   }
 }
 else{
   new AntBuilder().sequential {
-   copy(file:"${context.serviceDirectory}/overwrite/gs-webui.sh",todir:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}/tools/gs-webui",overwrite:"true")
+   replace(file:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}/tools/gs-webui/gs-webui.sh",token:"8099",value:"${config.uiPort}")
    chmod(dir:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}/bin", perm:"+x", includes:"*.sh")
    chmod(dir:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}/tools/gs-webui", perm:"+x", includes:"*.sh")
   }
 }
-
 
 // Set license if defined
 if(config.license!=null && config.license.size()>0){
@@ -55,3 +53,4 @@ if(config.license!=null && config.license.size()>0){
   		out.write(template.toString())
 	}
 }
+

@@ -14,7 +14,7 @@
 * limitations under the License.
 *******************************************************************************/
 import java.util.concurrent.TimeUnit
-
+import java.util.UUID
 import org.cloudifysource.dsl.utils.ServiceUtils
 import org.cloudifysource.dsl.context.ServiceContextFactory
 import org.openspaces.admin.AdminFactory
@@ -23,6 +23,8 @@ import org.openspaces.admin.pu.config.ProcessingUnitConfig
 import org.openspaces.admin.space.SpaceDeployment
 import groovy.util.ConfigSlurper;
 import groovy.text.SimpleTemplateEngine
+import org.openspaces.core.gateway.GatewayTarget
+import org.openspaces.admin.space.Space
 
 
 def context=ServiceContextFactory.serviceContext
@@ -44,6 +46,9 @@ while (true){
 	i++
 }
 
+
+println "deploy-gateway called: puname='${puname}' spacename='${spacename}' localgwname='${localgwname}' targets='${targets}' sources='${sources}'" 
+
 assert (spacename!=null),"space name must not be null"
 assert (localgwname!=null),"local gateway name must not be null"
 
@@ -57,8 +62,8 @@ new AntBuilder().sequential(){
 def binding=[:]
 binding['localgwname']=localgwname
 binding['localspaceurl']="jini://${context.privateAddress}:${config.lusPort}/${spacename}"
-binding['targets']=targets.split(",")
-binding['sources']=sources.split(",")
+binding['targets']=targets.length()>0?targets.split(","):null
+binding['sources']=sources.length()>0?sources.split(","):null
 binding['lookups']=lookups	
 
 def engine = new SimpleTemplateEngine()
@@ -85,6 +90,17 @@ def pu=new ProcessingUnitConfig()
 pu.setProcessingUnit("${config.installDir}/gwpu")
 pu.setName(puname)
 gsm.deploy(pu)
+
+// update admin
+if(targets!=null && targets.trim().length()>0){
+	GatewayTarget gwTarget = new GatewayTarget(localgwname)
+	Space space=admin.getSpaces().waitFor(spacename,10,TimeUnit.SECONDS)
+
+	if(space==null)gsm.undeploy(puname)
+	assert space!=null,"failed to locate space ${spacename}"
+
+	space.getReplicationManager().addGatewayTarget(gwTarget)
+}
 
 admin.close()
 

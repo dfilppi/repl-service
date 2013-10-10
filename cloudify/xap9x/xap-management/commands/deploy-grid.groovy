@@ -37,15 +37,15 @@ maxpermachine=context.attributes.thisInstance["deploy-grid-maxpermachine"]
 assert (name!=null),"name must not be null"
 if(partitions==null||partitions.toInteger()<=0)partitions ="1"
 if(backups==null||backups.toInteger()<0)backups="0"
-if(schema==null||schema=="")schema=""
+if(schema==null||schema=="")schema="partitioned-sync2backup"
 if(maxpervm==null||maxpervm.toInteger()<=0)maxpervm="1"
 if(maxpermachine==null||maxpermachine.toInteger()<=0)maxpermachine="1"
 
 //DEPLOY
 
 // find gsm
-admin=new AdminFactory().addLocators("127.0.0.1:${config.lusPort}").createAdmin();
-gsm=admin.gridServiceManagers.waitForAtLeastOne(10,TimeUnit.SECONDS)
+admin=new AdminFactory().useDaemonThreads(true).addLocators("127.0.0.1:${config.lusPort}").createAdmin();
+gsm=admin.gridServiceManagers.waitForAtLeastOne(1,TimeUnit.MINUTES)
 assert gsm!=null
 
 // make sure there are GSCs
@@ -61,7 +61,7 @@ sd.numberOfBackups(backups.toInteger())
 sd.maxInstancesPerMachine(maxpermachine.toInteger())
 sd.maxInstancesPerVM(maxpervm.toInteger())
 pu=gsm.deploy(sd)
-assert (pu.waitFor(1,10,TimeUnit.SECONDS)),"deployment failed"
+assert (pu.waitFor(1,30,TimeUnit.SECONDS)),"deployment failed"
 
 admin.close()
 return true

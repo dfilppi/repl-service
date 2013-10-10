@@ -45,15 +45,27 @@ service {
 			uuid=context.attributes.thisInstance.uuid
 			i=0
 			while (uuid==null){
-				uuid=context.attributes.thisInstance.uuid
 				Thread.sleep 1000
+				uuid=context.attributes.thisInstance.uuid
 				if (i>10){
 					println "LOCATOR TIMED OUT"
 					break
 				}
 				i=i+1
 			}
-			def pids=ServiceUtils.ProcessUtils.getPidsWithQuery("Args.*.ct=${uuid}");
+			if(i>11)return null
+
+			i=0
+			def pids=[]
+			while(pids.size()==0){
+				pids=ServiceUtils.ProcessUtils.getPidsWithQuery("Args.*.ct=${uuid}");
+				i++;
+				if(i>10){
+					println "PROCESS NOT DETECTED"
+					break
+				}
+				Thread.sleep(1000)
+			}
 			return pids
 		}
 	}

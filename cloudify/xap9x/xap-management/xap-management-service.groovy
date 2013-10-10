@@ -19,6 +19,7 @@ import org.openspaces.admin.Admin
 import java.util.concurrent.TimeUnit
 import util
 
+
 /**
 
 Manages XAP management node(s).  Also starts Web UI.
@@ -33,6 +34,8 @@ service {
 	numInstances (context.isLocalCloud()?1:2 )
 	minAllowedInstances 1
 	maxAllowedInstances 2
+
+	def admin = null
 
 	compute {
        	 	template "${template}"
@@ -49,6 +52,35 @@ service {
         	startDetection {
             		ServiceUtils.isPortOccupied(uiPort)
         	}
+
+		locator {
+			uuid=context.attributes.thisInstance.uuid
+			i=0
+			while (uuid==null){
+				Thread.sleep 1000
+				uuid=context.attributes.thisInstance.uuid
+				if (i>10){
+					println "LOCATOR TIMED OUT"
+					break
+				}
+				i++
+			}
+			if(i>11)return null
+
+			i=0
+			def pids=[]
+			while(pids.size()==0){
+				pids=ServiceUtils.ProcessUtils.getPidsWithQuery("Args.*.ct=${uuid}");
+				i++
+				if(i>10){
+					println "PROCESS NOT DETECTED"
+					break
+				}
+				Thread.sleep(1000)
+			}
+
+			return pids
+		}
 
 		details {
 			def currPublicIP
@@ -68,9 +100,13 @@ service {
 		}
 		
 		monitors {
-			def admin = new AdminFactory()
+			if(admin==null){
+				admin = new AdminFactory()
+				.useDaemonThreads(true)
 				.addLocators("127.0.0.1:"+lusPort)
 				.create();
+			}
+
 			def gscs=admin.gridServiceContainers
 			gscs.waitFor(200,1,TimeUnit.MILLISECONDS)
 			def pus=admin.processingUnits
@@ -102,18 +138,6 @@ service {
 				"deploy-pu-puname":puname
 			])
 		 },
-		"deploy-epu": {puname, puurl,schema,partitions,backups,maxmemmb,maxcores,memcapacity,numcores ->
-			util.invokeLocal(context,"_deploy-epu", [
-				"deploy-epu-puurl":puurl,
-				"deploy-epu-schema":schema,
-				"deploy-epu-partitions":partitions,
-				"deploy-epu-backups":backups,
-				"deploy-epu-maxmemmb":maxmemmb,
-				"deploy-epu-maxcores":maxcores,
-				"deploy-epu-memcapacity":memcapacity,
-				"deploy-epu-numcores":numcores
-			])
-		 },
 		"deploy-pu-basic": {puurl->
 			util.invokeLocal(context,"_deploy-pu", [
 				"deploy-pu-puurl":puurl,
@@ -138,27 +162,15 @@ service {
 		},
 		"undeploy-grid" : { name ->
 			util.invokeLocal(context,"_undeploy-grid", [
-				"undeploy-grid":name
+				"undeploy-grid-name":name
 			])
 		},
-		"deploy-gateway" : { puname,spacename,localgwname,targets,sources,String...lookups->
-			def gwargs=["deploy-gateway-puname":puname,"deploy-gateway-spacename":spacename,"deploy-gateway-localgwname":localgwname]
-			gwargs["deploy-gateway-targets"]=targets
-			gwargs["deploy-gateway-sources"]=sources
-			lookups.eachWithIndex(){lookup,i->
-				gwargs.put("deploy-gateway-lookup"+i,lookup)
-			}	
-			util.invokeLocal(context,"_deploy-gateway",gwargs)
-			},
-
 
 
 		//Actual parameterized calls
 		"_deploy-pu"	: "commands/deploy-pu.groovy",
-		"_deploy-epu"	: "commands/deploy-epu.groovy",
 		"_deploy-grid"	: "commands/deploy-grid.groovy",
 		"_undeploy-grid": "commands/undeploy-grid.groovy",
-		"_deploy-gateway": "commands/deploy-gateway.groovy"
 
 	])
 

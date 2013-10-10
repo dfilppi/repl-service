@@ -14,13 +14,17 @@
 * limitations under the License.
 *******************************************************************************/
 import java.util.concurrent.TimeUnit
-
 import org.cloudifysource.dsl.utils.ServiceUtils
 import org.cloudifysource.dsl.context.ServiceContextFactory
 import org.openspaces.admin.AdminFactory
 import org.openspaces.admin.application.config.ApplicationConfig
 import org.openspaces.admin.pu.config.ProcessingUnitConfig
 import groovy.util.ConfigSlurper;
+
+
+/*
+  Merges the supplied line with the /etc/hosts file
+*/
 
 if(ServiceUtils.isWindows())assert false,"NOT IMPLEMENTED FOR WINDOWS"
 
@@ -33,23 +37,24 @@ assert hostsline!=null, "no etc hosts entry supplied"
 
 def address=hostsline[0]
 def lines=[]
+def found=false
 new File("/etc/hosts").eachLine{ line->
-	def toks=line.split()
-	if(toks[0]==address)return
-	def found=false
-	toks[1..toks.size()-1].each{ tok->
-		hostsline[1..hostsline.size()-1].each{ h->
-			if(tok==h)found=true
+	def toks=[]
+	toks.addAll(line.split())
+	if(toks.size()==0)return
+	if(toks[0]==address){
+		found=true
+		//merge
+		hostsline[1..-1].each{
+			toks.add(it)
 		}
-		if(found)return
 	}
-	if(found)return
-	lines.add(line)  //strip any old defs of same address
+	lines.add(toks.join(" "))
 }
 new File("/etc/hosts").withWriter{out->
 	lines.each{ line->
 		out.writeLine(line)
 	}
-	out.writeLine(hostsline.join(" "))
+	if(!found)out.writeLine(hostsline.join(" "))
 }
 

@@ -27,5 +27,4 @@ SET launchTarget=
 SET options=
 
 start /b %XAPDIR%\bin\gsm.bat
-if %ESM%=="true" start /b %XAPDIR%\bin\esm.bat
 cmd /c %XAPDIR%\bin\gs-webui.bat

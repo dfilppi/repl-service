@@ -30,7 +30,6 @@ def static invokeLocal(context,name,args){
 	args.each{ key,val->
 			context.attributes.thisInstance[key] = val
 	}
-	println "calling getThisService"
 	getThisService(context).invoke(name)
 }
 

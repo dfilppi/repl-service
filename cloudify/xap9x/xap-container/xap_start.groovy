@@ -24,16 +24,20 @@ import util
 context=ServiceContextFactory.serviceContext
 config = new ConfigSlurper().parse(new File(context.serviceName+"-service.properties").toURL())
 ip=InetAddress.getLocalHost().getHostAddress()
-uuid=UUID.randomUUID().toString()
-context.attributes.thisInstance.uuid=uuid
+uuid=context.attributes.thisInstance.uuid
+if(uuid==null){
+	uuid=UUID.randomUUID().toString()
+	context.attributes.thisInstance.uuid=uuid
+}
 
 thisService=util.getThisService(context)
-println "Got this service = "+thisService
 
 //Get locator(s)
-mgmt=context.waitForService(config.managementService,10,TimeUnit.SECONDS)
+mgmt=context.waitForService(config.managementService,1,TimeUnit.MINUTES)
+assert (mgmt!=null && mgmt.instances.size()),"No management services found"
 locators=""
 lusnum=0
+
 mgmt.instances.each{
 	def lusname="lus${it.instanceId}"
 println "invoking update-hosts with ${it.hostAddress} ${lusname}"
@@ -48,7 +52,7 @@ new AntBuilder().sequential {
 		error:"runxap.${System.currentTimeMillis()}.err"
 	){
 		env(key:"XAPDIR", value:"${config.installDir}\\${config.xapDir}")
-		env(key:"GSC_JAVA_OPTIONS",value:"-Xmx${config.gscSize} -Xms${config.gscSize} -DUUID=${uuid}")
+		env(key:"GSC_JAVA_OPTIONS",value:"${config.gsc_jvm_options} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false")
 		env(key:"LOOKUPLOCATORS",value:locators)
 		env(key:"NIC_ADDR",value:"${ip}")
 	} 
@@ -59,7 +63,7 @@ new AntBuilder().sequential {
 		output:"runxap.${System.currentTimeMillis()}.out",
 		error:"runxap.${System.currentTimeMillis()}.err"
 	){
-		env(key:"GSC_JAVA_OPTIONS",value:"-Xmx${config.gscSize} -Xms${config.gscSize} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false");
+		env(key:"GSC_JAVA_OPTIONS",value:"${config.gsc_jvm_options} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false")
 		env(key:"XAPDIR", value:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}")
 		env(key:"LOOKUPLOCATORS",value:"${locators}")
 		env(key:"NIC_ADDR",value:"${ip}")

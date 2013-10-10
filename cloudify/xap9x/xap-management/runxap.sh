@@ -26,8 +26,10 @@ startParm=
 launchTarget=
 options=
 
+ulimit -n 32000
+ulimit -u 32000
+
 $XAPDIR/bin/gsm.sh &
-if [ "$ESM" = "true" ]; then
-	$XAPDIR/bin/esm.sh &
-fi
-$XAPDIR/bin/gs-webui.sh
+$XAPDIR/bin/gs-webui.sh &
+
+sleep 10000d

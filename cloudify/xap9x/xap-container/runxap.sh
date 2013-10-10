@@ -26,4 +26,9 @@ startParm=
 launchTarget=
 options=
 
+ulimit -n 32000
+ulimit -u 32000
+
+echo "GSC_JAVA_OPTIONS=${GSC_JAVA_OPTIONS}"
+
 $XAPDIR/bin/gsc.sh
