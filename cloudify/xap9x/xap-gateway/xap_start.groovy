@@ -52,8 +52,8 @@ new AntBuilder().sequential {
 		error:"runxap.${System.currentTimeMillis()}.err"
 	){
 		env(key:"XAPDIR", value:"${config.installDir}\\${config.xapDir}")
-		env(key:"GSC_JAVA_OPTIONS",value:"${config.gsc_jvm_options} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false -Dcom.gs.zones=${context.applicationName}.${context.serviceName}")
-		env(key:"LOOKUPLOCATORS",value:locators)
+		env(key:"GSC_JAVA_OPTIONS",value:"${config.gsc_jvm_options} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false -Dcom.gs.zones=${context.applicationName}.${context.serviceName}.GATEWAY -Dcom.gs.transport_protocol.lrmi.bind-port=${config.lrmiBindPort} -Dcom.sun.jini.reggie.initialUnicastDiscoveryPort=${config.initialDiscoveryPort} -Dcom.gs.jini_lus.locators=${locators}")
+		env(key:"LOOKUPLOCATORS",value:"${locators}")
 		env(key:"NIC_ADDR",value:"${ip}")
 	} 
 
@@ -63,8 +63,8 @@ new AntBuilder().sequential {
 		output:"runxap.${System.currentTimeMillis()}.out",
 		error:"runxap.${System.currentTimeMillis()}.err"
 	){
-		env(key:"GSC_JAVA_OPTIONS",value:"${config.gsc_jvm_options} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false -Dcom.gs.zones=${context.applicationName}.${context.serviceName}")
 		env(key:"XAPDIR", value:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}")
+		env(key:"GSC_JAVA_OPTIONS",value:"${config.gsc_jvm_options} -DUUID=${uuid} -Dcom.gs.multicast.enabled=false -Dcom.gs.zones=${context.applicationName}.${context.serviceName}.GATEWAY -Dcom.gs.transport_protocol.lrmi.bind-port=${config.lrmiBindPort} -Dcom.sun.jini.reggie.initialUnicastDiscoveryPort=${config.initialDiscoveryPort} -Dcom.gs.jini_lus.locators=${locators}")
 		env(key:"LOOKUPLOCATORS",value:"${locators}")
 		env(key:"NIC_ADDR",value:"${ip}")
 	}

@@ -96,7 +96,7 @@ assert space!=null,"failed to locate space ${spacename}"
 def pucfg=new ProcessingUnitConfig()
 pucfg.setProcessingUnit("${config.installDir}/gwpu")
 pucfg.setName(puname)
-pucfg.setZones(["${context.applicationName}.${context.serviceName}" as String] as String[]) //only deploy to this gsc
+pucfg.setZones(["${context.applicationName}.${context.serviceName}.GATEWAY" as String] as String[]) //only deploy to this gsc
 def pu=gsm.deploy(pucfg)
 def i=0
 while(pu.instances.length==0){
