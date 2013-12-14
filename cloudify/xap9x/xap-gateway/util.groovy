@@ -1,4 +1,5 @@
 import java.util.concurrent.TimeUnit
+import java.util.regex.*
 
 // Find this service instance
 
@@ -34,3 +35,10 @@ def static invokeLocal(context,name,args){
 	getThisService(context).invoke(name)
 }
 
+//Puts quotes around alpha-num substrings in parameter
+
+def static quoteAlnum(unquoted){
+	def p=Pattern.compile('([a-zA-Z0-9_\\.]+)')
+	def m=p.matcher(unquoted)
+	return m.replaceAll("\"\$1\"")
+}

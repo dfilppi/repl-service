@@ -26,16 +26,10 @@ service {
 	maxAllowedInstances 1
 
 
-	lifecycle{
-
-		//postStart "xap_poststart.groovy"
-
-	}
-
 	customCommands ([
 //Public entry points
 
-		"test": "xap_poststart.groovy"
+		"install-gateway": "install_gateway.groovy"
 
 	])
 
