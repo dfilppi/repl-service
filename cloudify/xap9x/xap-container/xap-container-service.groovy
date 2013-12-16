@@ -23,7 +23,7 @@ service {
 	type "APP_SERVER"
 	icon "xap.png"
 	elastic true
-	numInstances 1
+	numInstances containerCount
 	minAllowedInstances 1
 	maxAllowedInstances maxinstances
 
