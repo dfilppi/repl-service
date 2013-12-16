@@ -37,7 +37,7 @@ def localgwname=args[1]
 def pairs=Eval.me(util.quoteAlnum(args[2]))
 def lookups=Eval.me(util.quoteAlnum(args[3]))
 
-println "deploy-gateway called: mgmt service=${config.managementService} puname='${puname}' spacename='${spacename}' localgwname='${localgwname}' pairs='${pairs}'"
+println "install-gateway called: mgmt service=${config.managementService} puname='${puname}' spacename='${spacename}' localgwname='${localgwname}' pairs='${pairs}'"
 
 
 assert (spacename!=null),"space name must not be null"
