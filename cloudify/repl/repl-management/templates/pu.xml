@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:os-core="http://www.openspaces.org/schema/core" xmlns:os-events="http://www.openspaces.org/schema/events"
+	xmlns:os-gateway="http://www.openspaces.org/schema/core/gateway"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:os-remoting="http://www.openspaces.org/schema/remoting"
+	xmlns:os-sla="http://www.openspaces.org/schema/sla"
+	xmlns:sws="http://www.springframework.org/schema/web-services"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd        
+      http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
+      http://www.openspaces.org/schema/events http://www.openspaces.org/schema/events/openspaces-events.xsd
+      http://www.openspaces.org/schema/remoting http://www.openspaces.org/schema/remoting/openspaces-remoting.xsd
+      http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+      http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
+      http://www.openspaces.org/schema/core/gateway http://www.openspaces.org/schema/9.5/core/gateway/openspaces-gateway.xsd
+		">
+		
+	<!-- Enable scan for OpenSpaces and Spring components -->
+	<context:component-scan base-package="com.tms.poc.xapservice" />
+	<context:annotation-config/>
+	<os-remoting:annotation-support />		
+	<os-events:annotation-support />
+	<os-core:giga-space-context />
+
+
+	<bean id="propertiesConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	</bean>
+
+	<!-- SPACE DEF -->
+	
+	<os-core:space id="ijspace" url="/./${spacename}"
+		gateway-targets="gatewayTargets" />
+
+	<os-core:distributed-tx-manager id="transactionManager"
+		default-timeout="5000" />
+	<os-core:giga-space id="space" space="ijspace"
+		tx-manager="transactionManager" />
+
+	<os-gateway:targets id="gatewayTargets" local-gateway-name="${lname}">
+	</os-gateway:targets>
+		
+	
+	<!-- does the remoting of annotated services -->
+	<os-remoting:service-exporter id="serviceExporter" />
+</beans>

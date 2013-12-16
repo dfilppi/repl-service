@@ -26,7 +26,7 @@ running to provide memory storage for replication.
 
 **/
 service {
-	extend "../../xap9.x/xap-management"
+	extend "../../xap9x/xap-management"
 	name "repl-management"
 
 	compute {
@@ -35,44 +35,24 @@ service {
 
 	lifecycle{
 
-
-		//postStart "postStart.groovy"
-
 	}
 
+
 	customCommands ([
-	//Public entry points
-		"create-space"	: {name,partitions,backups->
-			util.invokeLocal(context,"_create-space", [
-				"deploy-space-name":name,
-				"deploy-space-partitions":partitions,
-				"deploy-space-backups":backups
-				])
-			},
-		"destroy-space"	: {name->
-			util.invokeLocal(context,"_destroy-space", [
-				"deploy-space-name":name,
-				])
-			},
-		"deploy-gateway" : { spacename,localgwname,targets,sources,String...lookups->
-			def gwargs=["spacename":spacename,"localgwname":localgwname]
-			gwargs["targets"]=targets
-			gwargs["sources"]=sources
-			lookups.eachWithIndex(){lookup,i->
-				gwargs.put("lookup"+i,lookup)
-			}	
-			util.invokeLocal(context,"_deploy-gateway",gwargs)
-			},
+//Public entry points
 
+		"add-repl-space": {name, primaries, backups ->
+			util.invokeLocal(context,"_add-repl-space", [
+				"repl-space-name":name,
+				"repl-space-primaries":primaries,
+				"repl-space-backups":backups
+			])
+		 },
 
-	//Private entry points
-
-		"_create-space" : "commands/create-space.groovy",
-		"_destroy-space" : "commands/destroy-space.groovy",
-		"_deploy-gateway" : "commands/deploy-gateway.groovy",
+		//Actual parameterized calls
+		"_add-repl-space"	: "commands/add_repl_space.groovy",
 
 	])
-
 
 	userInterface {
 		metricGroups = ([

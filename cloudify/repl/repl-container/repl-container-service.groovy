@@ -16,7 +16,8 @@
 
 
 service {
-	extend "../../xap9.x/xap-container"
+	extend "../../xap9x/xap-container"
 
 	name "repl-container"
+
 }
