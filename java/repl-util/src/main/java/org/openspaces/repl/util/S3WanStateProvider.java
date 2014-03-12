@@ -197,26 +197,4 @@ public class S3WanStateProvider implements WanStateProvider {
 		return false;
 	}
 	
-	public static void main(String[] args){
-		Map<String,Object> cfg=new HashMap<String,Object>();
-		cfg.put(S3WanStateProvider.CONFIG_ACCESS_KEY,"AKIAIFRAQQ644AXKSPNQ");
-		cfg.put(S3WanStateProvider.CONFIG_SECRET_KEY,"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");
-		S3WanStateProvider p=new S3WanStateProvider(cfg);
-		
-		TopologySpec s=new TopologySpec();
-		s.setName("test");
-		p.createTopology(s, true);
-		
-
-/*		SiteDetails d=new SiteDetails();
-		d.setGatewayPublicAddress("xxxxxxxxxx");
-		d.setCommport(999);
-		d.setDiscoport(233);
-		d.setSiteId("B");
-		p.updateDetails("mytopo","B",d);
-		
-		TopologySpec s2=p.getTopology("mytopo");
-		System.out.println(s2.getName());
-	*/	
-	}
 }
