@@ -16,7 +16,7 @@
 import java.util.concurrent.TimeUnit
 import java.util.UUID
 import org.cloudifysource.dsl.utils.ServiceUtils
-import org.cloudifysource.dsl.context.ServiceContextFactory
+import org.cloudifysource.utilitydomain.context.ServiceContextFactory
 import org.openspaces.admin.AdminFactory
 import org.openspaces.admin.application.config.ApplicationConfig
 import org.openspaces.admin.pu.config.ProcessingUnitConfig
@@ -34,6 +34,7 @@ def config = new ConfigSlurper().parse(new File(context.serviceName+"-service.pr
 def spacename=context.attributes.thisInstance["repl-space-name"]
 def primaries=context.attributes.thisInstance["repl-space-primaries"]
 def backups=context.attributes.thisInstance["repl-space-backups"]
+def gwname=context.attributes.thisInstance["repl-space-gwname"]
 
 assert (spacename!=null),"space name must not be null"
 
@@ -52,7 +53,7 @@ new AntBuilder().sequential(){
 
 def binding=[:]
 binding['spacename']=spacename
-binding['lname']="${spacename}-gw"
+binding['lname']=gwname
 
 def engine = new SimpleTemplateEngine()
 def putemplate = new File('templates/pu.xml')
@@ -75,12 +76,16 @@ pucfg.setClusterSchema("partitioned-sync2backup")
 pucfg.setNumberOfInstances(primaries.toInteger())
 pucfg.setNumberOfBackups(backups.toInteger())
 pucfg.setName(spacename)
+pucfg.addZone("${context.applicationName}.${config.containerServiceName}.gsc")
 def pu=gsm.deploy(pucfg)
 def i=0
 while(pu.instances.length==0){
-	Thread.sleep(1000)
-	i++;
-	assert i<60,"timed out waiting for space deployment"
+        Thread.sleep(1000)
+        i++;
+        if(i>120){
+                gsm.undeploy(spacename)
+                throw new RuntimeException("timed out waiting for space deployment")
+        }
 }
 
 return true

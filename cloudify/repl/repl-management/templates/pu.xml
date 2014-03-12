@@ -19,8 +19,6 @@
       http://www.openspaces.org/schema/core/gateway http://www.openspaces.org/schema/9.5/core/gateway/openspaces-gateway.xsd
 		">
 		
-	<!-- Enable scan for OpenSpaces and Spring components -->
-	<context:component-scan base-package="com.tms.poc.xapservice" />
 	<context:annotation-config/>
 	<os-remoting:annotation-support />		
 	<os-events:annotation-support />
@@ -43,7 +41,6 @@
 
 	<os-gateway:targets id="gatewayTargets" local-gateway-name="${lname}">
 	</os-gateway:targets>
-		
 	
 	<!-- does the remoting of annotated services -->
 	<os-remoting:service-exporter id="serviceExporter" />

@@ -16,7 +16,7 @@
 import groovy.text.SimpleTemplateEngine
 import groovy.util.ConfigSlurper;
 import org.cloudifysource.dsl.utils.ServiceUtils
-import org.cloudifysource.dsl.context.ServiceContextFactory
+import org.cloudifysource.utilitydomain.context.ServiceContextFactory
 
 
 context=ServiceContextFactory.serviceContext
@@ -27,6 +27,13 @@ new AntBuilder().sequential {
 	get(src:config.downloadPath, dest:"${context.serviceDirectory}/${config.installDir}/${config.zipName}", skipexisting:true)
 	unzip(src:"${context.serviceDirectory}/${config.installDir}/${config.zipName}", dest:config.installDir, overwrite:true)
    	chmod(dir:"${context.serviceDirectory}/${config.installDir}/${config.xapDir}/bin", perm:"+x", includes:"*.sh")
+}
+
+//add logging config
+if(config.logLines!=null){
+	new File("${context.serviceDirectory}/${config.installDir}/${config.xapDir}/config/gs_logging.properties").withWriterAppend{writer->
+			config.logLines.each{ writer.writeLine(it)}
+	}
 }
 
 

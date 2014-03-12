@@ -48,7 +48,7 @@ service {
 
 		start "xap_start.groovy"
 
-	        startDetectionTimeoutSecs 60
+	        startDetectionTimeoutSecs 300
         	startDetection {
             		ServiceUtils.isPortOccupied(uiPort)
         	}
@@ -157,7 +157,7 @@ service {
 				"deploy-grid-partitions":partitions,
 				"deploy-grid-backups":backups,
 				"deploy-grid-maxpervm":maxpervm,
-				"deploy-grid-maxpermachine":maxpermachine
+				"deploy-grid-maxpermachine":maxpermachine,
 			])
 		},
 		"undeploy-grid" : { name ->

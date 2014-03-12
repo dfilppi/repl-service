@@ -41,11 +41,12 @@ service {
 	customCommands ([
 //Public entry points
 
-		"add-repl-space": {name, primaries, backups ->
+		"add-repl-space": {name, primaries, backups, gwname ->
 			util.invokeLocal(context,"_add-repl-space", [
 				"repl-space-name":name,
 				"repl-space-primaries":primaries,
-				"repl-space-backups":backups
+				"repl-space-backups":backups,
+				"repl-space-gwname":gwname
 			])
 		 },
 
