@@ -35,6 +35,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -57,6 +59,7 @@ import org.cloudifysource.restclient.exceptions.RestClientResponseException;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openspaces.admin.Admin;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +68,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.ServletContextAware;
 
 /**
  * Spring MVC controller for a RESTful Replication API
@@ -89,7 +93,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @Controller
 @RequestMapping(value = "/rest/repl/*")
-public class ReplicationRESTController {
+public class ReplicationRESTController implements ServletContextAware{
 	private static final Logger log=Logger.getLogger(ReplicationRESTController.class.getName());
 	private static final String APPLICATION_PATH="",CLOUDIFY_VERSION="2.7.0";
 	private static final String DEFAULT_DATA_PORT="10000";
@@ -97,6 +101,9 @@ public class ReplicationRESTController {
 	private Admin admin=null;
 	private HttpClient client=HttpClientBuilder.create().build();
 	private boolean test=true;
+	@Value("${recipe.path}")
+	private String recipePath;
+	private ServletContext servletContext=null;
 
 	@RequestMapping(value="/topology/{name}",method=RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
@@ -368,7 +375,7 @@ public class ReplicationRESTController {
 				final RestClient restClient=new RestClient(new URL("http://"+endpoint.address+":"+endpoint.port),"","",CLOUDIFY_VERSION);
 				restClient.connect();
 				//upload app
-				File packed=Packager.packApplication(createDslReader(new File("C:\\gigaspaces\\src\\github\\repl-service\\cloudify\\repl")).readDslEntity(Application.class),new File("C:\\gigaspaces\\src\\github\\repl-service\\cloudify\\repl"));
+				File packed=Packager.packApplication(createDslReader(new File(recipePath+File.separator+"repl-service"+File.separator+"cloudify"+File.separator+"repl")).readDslEntity(Application.class),new File(recipePath));
 				UploadResponse uploadResponse = restClient.upload(null, packed);
 
 				//upload overrides
@@ -594,6 +601,11 @@ public class ReplicationRESTController {
 			System.out.println(it.next().getValueAsText());
 		}
 		 */
+	}
+
+	@Override
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext=servletContext;
 	}
 
 }

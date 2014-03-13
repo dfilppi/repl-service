@@ -8,6 +8,9 @@
 
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>/WEB-INF/config.properties</value>
+		</property>
 	</bean>
 
 	<bean id="jsonView"
